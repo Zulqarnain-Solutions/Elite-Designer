@@ -1,0 +1,50 @@
+/* ==========================================================================
+   elitedesigner — motion layer
+   GSAP/ScrollTrigger drive scroll choreography from js/animations.js.
+   This file only holds CSS-native loops, split-text scaffolding and the
+   overlay enter states — so nothing here duplicates a GSAP responsibility.
+   ========================================================================== */
+
+/* Split-text masks (words are wrapped by JS) */
+.split-w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .14em; margin-bottom: -.14em; padding-right: .06em; margin-right: -.06em; }
+.split-i { display: inline-block; will-change: transform; }
+
+/* Infinite marquee (track content is duplicated by JS for a seamless loop) */
+@keyframes marquee { to { transform: translate3d(-50%, 0, 0); } }
+.marquee__track.is-ready { animation: marquee 38s linear infinite; }
+.marquee:hover .marquee__track.is-ready { animation-play-state: paused; }
+
+/* Floating glass labels in the hero */
+@keyframes float-y { 0%, 100% { translate: 0 0; } 50% { translate: 0 -10px; } }
+[data-float] { animation: float-y 6s ease-in-out infinite; }
+.hero__tag--b { animation-delay: -2.6s; animation-duration: 7.2s; }
+@keyframes pulse-dot { 0%, 100% { box-shadow: 0 0 0 4px rgba(200, 178, 150, 0.35); } 50% { box-shadow: 0 0 0 9px rgba(200, 178, 150, 0); } }
+.hero__tag i { animation: pulse-dot 2.6s ease-out infinite; }
+
+/* Overlay entrances (viewer / field note / search) */
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes panel-in { from { opacity: 0; transform: translateY(28px) scale(.985); } }
+@keyframes drop-in { from { opacity: 0; transform: translateY(-18px); } }
+.viewer__backdrop, .note__backdrop, .search__backdrop { animation: fade-in .5s var(--ease) both; }
+.viewer__panel, .note__panel { animation: panel-in .7s var(--ease) both; }
+.search__panel { animation: drop-in .55s var(--ease) both; }
+.is-closing .viewer__backdrop, .is-closing .note__backdrop, .is-closing .search__backdrop,
+.is-closing .viewer__panel, .is-closing .note__panel, .is-closing .search__panel { animation: fade-in .28s var(--ease) reverse both; }
+
+.result { animation: fade-in .4s var(--ease) both; }
+
+/* Load-more spinner */
+@keyframes spin { to { rotate: 360deg; } }
+.is-loading svg { animation: spin .9s linear infinite; }
+
+/* Reduced motion: keep everything visible, remove movement */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+  .marquee__track.is-ready, [data-float], .hero__tag i { animation: none !important; }
+  .hero__media img { transform: none; }
+}
+
+/* Pre-intro state: avoids a flash before the hero timeline starts.
+   A 3.5s inline failsafe in <head> adds .is-ready even if scripts fail. */
+html.js:not(.is-ready) .hero__content, html.js:not(.is-ready) .hero__notes,
+html.js:not(.is-ready) .hero__caption, html.js:not(.is-ready) .hero__tag { opacity: 0; }
